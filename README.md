@@ -1,75 +1,54 @@
-# NAI-Prompt-Selector
+# AutoNai personal
 
-NovelAI 이미지 페이지(`https://novelai.net/image`)에서 작동하는 Chrome Manifest V3 확장프로그램입니다.
+NovelAI 이미지 페이지(`https://novelai.net/image`)에서 반복 생성을 실행하는 개인용 Chrome Manifest V3 확장프로그램입니다.
 
-## 포함된 기능
+현재 버전은 **v0.3.8**입니다. 프롬프트 관리·선택·편집·슬롯 적용·가져오기·내보내기 기능과 관련 코드 및 테스트를 제거했습니다. NovelAI 페이지에서 설정한 프롬프트와 생성 옵션으로 반복 생성합니다.
 
-- NAIToolbar 기반 자동 생성
-  - 1회 생성
-  - 반복 자동 생성
-  - 생성 간격과 목표 횟수
-  - 자동 생성 완료 알림
-  - 최근 생성 이미지 강조
-  - 선택적 자동 저장
-- PromptSelector 기반 프롬프트 패널
-  - `[Group]` 형식의 그룹 정의
-  - 프롬프트 칩 선택
-  - 그룹별 전체 선택/해제
-  - `Ctrl + wheel` 가중치 조절(-3 ~ +3)
-  - Base Prompt에서 선행 프롬프트 선택 / Quick Prompt / 후행 프롬프트 선택 순서로 병합
-  - 미리보기와 복사
-  - Base Prompt / Undesired Content / Character Prompt / Character Undesired Content 슬롯별 편집
-  - 현재 NovelAI 페이지의 캐릭터 추가/삭제 상태를 감지해 슬롯 목록 갱신
-  - 현재 슬롯만 적용하거나 모든 현재 슬롯을 한 번에 적용
-  - NovelAI 캐릭터 추가, 삭제, 순서 변경
-  - 캐릭터 순서 변경 시 Prompt / Undesired Content 슬롯 쌍을 함께 이동
-  - 프롬프트 상태 JSON 내보내기/가져오기
-  - 최근 내부 백업 복구
-- 자동 생성 설정
-  - popup 또는 페이지 패널에서 목표 횟수와 생성 주기 설정
-- 페이지 단축키
-  - `Ctrl + Space`: 현재 슬롯 적용
-  - `Ctrl + Shift + Space`: 전체 슬롯 적용
-  - `Ctrl + Enter`: 자동 생성 실행
-  - `Ctrl + Alt + Enter`: 자동 생성 취소
-  - `` Ctrl + ` ``: 확장 UI 접기/펼치기
-  - 텍스트 입력 중에도 페이지 단축키를 우선 처리
-- NovelAI 강조 문법
-  - 기본 가중치: `1girl`
-  - 강조/약화: `1.5::1girl::`
-- 저장 안정성
-  - 현재 상태: `chrome.storage.local`의 `naiPromptSelector.selector`
-  - 최근 내부 백업: `naiPromptSelector.selectorBackups`
-  - 마지막 정상 상태: `naiPromptSelector.selectorLastGood`
-  - 비명시적 저장이 빈 프롬프트 상태로 후퇴하면 저장을 막고 마지막 정상 상태 복구를 시도
+저장소: [StopOverthinking/AutoNai-personal](https://github.com/StopOverthinking/AutoNai-personal)
 
-## 로드 방법
+## 기능
 
-1. Chrome에서 `chrome://extensions`를 엽니다.
-2. 개발자 모드를 켭니다.
-3. "압축해제된 확장 프로그램을 로드"를 누릅니다.
-4. 이 저장소 폴더(`NAI-Prompt-Selector`)를 선택합니다.
+- 3·5·10·20회 반복 생성, 매 생성 완료 후 1초 대기
+- 시작·중지 버튼과 진행 횟수 표시
+- 드래그 또는 이동 핸들의 방향키로 패널 이동, 위치 저장
+- 이번 반복 생성 결과의 히스토리에 청록색 테두리와 모서리 표시
+  - 1~4장 묶음의 생성 그룹을 구분하며 과거 항목이나 중복 표시를 새 결과로 계산하지 않음
+  - 재렌더링·히스토리 재표시 후에도 생성 그룹 ID를 기준으로 강조 복원
+  - 중지 당시 진행 중이던 생성의 늦은 결과도 강조
+  - 다음 수동·반복 생성 또는 페이지 이탈 시 이전 강조 해제
+- 목표 횟수 완료 시 화면 중앙에 완료 오버레이 표시
+  - 확인 버튼, Esc 또는 배경 클릭으로 닫기
+  - 중지·오류·시간 초과에는 표시하지 않음
+- 목표 횟수 완료 시 브라우저 알림 한 번 표시
+  - 확장 팝업의 `완료 알림` 체크박스로 켜기/끄기 (기본값: 켜짐)
+  - 기존 완료 알림 설정 유지, 다른 탭을 보고 있어도 알림 요청
+  - Chrome 및 운영체제의 알림 설정에 따라 실제 표시 여부가 달라짐
+- `Ctrl + Enter`: 시작 / `Ctrl + Alt + Enter`: 중지
+- 생성 버튼의 상태 변화, 새 히스토리 결과, 버튼 교체·재등장 및 탭 재개를 감지해 중복 요청 방지
+  - 시작 신호가 늦어도 중복 클릭 없이 최대 10분 동안 확인
+  - 준비 상태가 0.3초 유지되는지 확인한 뒤 완료 처리
 
-## 저장/복구 메모
+## 설치·업데이트
 
-Chrome의 압축해제 확장은 확장 ID별로 `chrome.storage.local`이 분리됩니다. 이전 조사에서 현재 Chrome Default 프로필에는 현재 ID `gaoaagohfcpdajlkklgdjmbjacacljll`와 이전 ID `hbfeidhlpjiojbihdplilpognahmjpoi` 저장소가 있었고, 두 저장소 모두 기본 샘플과 빈 선택 상태만 남아 있어 커스텀 프롬프트 복구 가능성이 낮았습니다.
+1. 이 저장소를 내려받거나 `output/AutoNai-personal-v0.3.8.zip`을 압축 해제합니다.
+2. Chrome에서 `chrome://extensions`를 열고 개발자 모드를 켭니다.
+3. **압축해제된 확장 프로그램을 로드**를 눌러 `manifest.json`이 있는 폴더를 선택합니다.
+4. NovelAI 이미지 페이지를 새로고침합니다.
 
-이번 버전은 `manifest.json`의 `key`로 향후 확장 ID가 경로 변경에 흔들리지 않도록 고정합니다. 단, 이 key를 처음 적용하는 순간에는 Chrome이 새 ID로 전환할 수 있으므로, 적용 직전 기존 패널에서 `Export`로 JSON 백업을 내려받고 새로 로드한 뒤 `Import`로 복구하는 절차를 권장합니다.
-
-패널의 `Storage Backup` 영역에서 다음 작업을 할 수 있습니다.
-
-- `Export`: 현재 프롬프트 상태를 `NAI-Prompt-Selector` JSON 백업으로 저장
-- `Import`: Export한 JSON 백업을 현재 상태로 복원
-- `Restore Backup`: 브라우저 내부에 남은 최근 정상 백업 또는 마지막 정상 상태를 복구
+기존 설치를 업데이트했다면 Chrome 확장 관리 화면에서 확장을 새로고침한 뒤 NovelAI 페이지도 새로고침하세요. `manifest.json`의 기존 `key`를 유지하므로 이름 변경 후에도 확장 ID와 반복 생성 설정을 이어받습니다.
 
 ## 검증
 
+Node.js/npm과 PowerShell이 필요합니다. 브라우저 검증에는 `@playwright/cli`를 사용합니다.
+
 ```powershell
-node --check prompt-core.js
-node --check prompt-storage.js
 node --check content.js
 node --check background.js
-node --check popup\popup.js
-node tests\prompt-core.test.js
-node tests\prompt-storage.test.js
+node --check popup/popup.js
+node tests/completion-notification.test.js
+pwsh -File tests/browser-checks.ps1
 ```
+
+`tests/browser/`에 반복 생성·완료 알림·팝업·히스토리 회귀 검증 스크립트가 있습니다. 생성 검증은 요청을 가로채는 로컬 브라우저 시뮬레이션으로 수행하며 실제 이미지 생성 요청을 보내지 않습니다. `pwsh -File tests/browser-checks.ps1 -IncludeLiveSite`로 별도의 `live-ui` 검증도 실행할 수 있습니다. 실제 NovelAI 페이지의 데스크톱·모바일 생성 버튼 감지만 확인하며 생성 요청을 차단합니다.
+
+로그·화면·배포 ZIP은 `output/`에 저장하고 Git에 포함하지 않습니다.
